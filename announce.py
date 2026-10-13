@@ -9,6 +9,10 @@ GUILD = os.environ["GUILD_ID"]
 CHANNEL = os.environ["ANNOUNCE_CHANNEL_ID"]
 ROLE = os.environ["TEAM_ROLE_ID"]
 
+# Lancé à 10h et 11h UTC (heure d'été/hiver) : on ne continue que s'il est midi à Paris
+from zoneinfo import ZoneInfo
+if os.environ.get("GITHUB_EVENT_NAME") == "schedule" and datetime.now(ZoneInfo("Europe/Paris")).hour != 12: raise SystemExit(0)
+
 
 def api(method, path, body=None):
     req = urllib.request.Request(
