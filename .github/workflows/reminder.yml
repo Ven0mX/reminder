@@ -1,0 +1,21 @@
+name: Rappel quotidien événements Discord
+
+on:
+  schedule:
+    - cron: "0 10,11 * * *"
+  workflow_dispatch:
+
+jobs:
+  rappel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python rappel.py
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          GUILD_ID: ${{ secrets.GUILD_ID }}
+          ANNOUNCE_CHANNEL_ID: ${{ secrets.ANNOUNCE_CHANNEL_ID }}
+          TEAM_ROLE_ID: ${{ secrets.TEAM_ROLE_ID }}
