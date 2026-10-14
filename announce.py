@@ -32,6 +32,10 @@ def api(method, path, body=None):
 
 # Événements à venir / en cours du serveur
 events = api("GET", f"/guilds/{GUILD}/scheduled-events")
+guild = api("GET", f"/guilds/{GUILD}")
+print(f"Serveur : {guild['name']} — {len(events)} événement(s) trouvé(s)", flush=True)
+for ev in events:
+    print(f"  - {ev['name']} (statut {ev['status']}, début {ev['scheduled_start_time']})", flush=True)
 
 # Messages récents du salon d'annonces, pour ne pas annoncer deux fois le même événement
 messages = api("GET", f"/channels/{CHANNEL}/messages?limit=100")
@@ -43,6 +47,7 @@ deja_annonces = " ".join(
 for ev in sorted(events, key=lambda e: int(e["id"])):
     url = f"https://discord.com/events/{GUILD}/{ev['id']}"
     if url in deja_annonces:
+        print(f"Déjà annoncé, ignoré : {ev['name']}", flush=True)
         continue
 
     debut = int(datetime.fromisoformat(ev["scheduled_start_time"]).timestamp())
