@@ -1,6 +1,7 @@
 import os
 import json
 import urllib.request
+import urllib.error
 from datetime import datetime
 
 API = "https://discord.com/api/v10"
@@ -25,7 +26,12 @@ def api(method, path, body=None):
             "User-Agent": "DiscordBot (event-announcer, 1.0)",
         },
     )
-    with urllib.request.urlopen(req) as r:
+    try:
+        r = urllib.request.urlopen(req)
+    except urllib.error.HTTPError as e:
+        print(f"Erreur Discord {e.code} sur {method} {path} : {e.read().decode()}", flush=True)
+        raise
+    with r:
         data = r.read()
         return json.loads(data) if data else None
 
@@ -61,7 +67,7 @@ for ev in sorted(events, key=lambda e: int(e["id"])):
         "embeds": [{
             "title": ev["name"],
             "url": url,
-            "description": ev.get("description") or "",
+            **({"description": ev["description"]} if ev.get("description") else {}),
             "color": 0x5865F2,
             "fields": [
                 {"name": "Début", "value": f"<t:{debut}:F> (<t:{debut}:R>)"},
